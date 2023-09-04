@@ -8,21 +8,55 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-//TODO: add webservlet to "/calbmi"
-public class BMICalculatorServlet extends HttpServlet{
+@WebServlet("/calbmi")
+public class BMICalculatorServlet extends HttpServlet {
 
     @Override
-    protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //TODO: get parameter from request: "weight" and "height"
-        
-        //TODO: calculate bmi
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        // Get parameter from request: "weight" and "height"
+        String weightParam = request.getParameter("weight");
+        String heightParam = request.getParameter("height");
 
-        //TODO: determine the built from BMI
-      
-        //TODO: add bmi and built to the request's attribute
+        try {
+            // Convert weight and height parameters to double (you may need to handle
+            // exceptions)
+            double weight = Double.parseDouble(weightParam);
+            double height = Double.parseDouble(heightParam);
 
-        //TODO: forward to jsp
-           
+            // Calculate BMI
+            double bmi = calculateBMI(weight, height);
+
+            // Determine the build from BMI
+            String build = determineBuild(bmi);
+
+            // Add BMI and build to the request's attribute
+            request.setAttribute("bmi", bmi);
+            request.setAttribute("build", build);
+
+            // Forward to JSP
+            request.getRequestDispatcher("/bmi_result.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            // Handle invalid input (e.g., non-numeric weight or height)
+            response.getWriter().println("Invalid input. Please enter numeric values for weight and height.");
+        }
     }
-    
+
+    // Calculate BMI using the given weight (in kilograms) and height (in meters)
+    private double calculateBMI(double weight, double height) {
+        return weight / (height * height);
+    }
+
+    // Determine the build from BMI (you can define your own logic for this)
+    private String determineBuild(double bmi) {
+        if (bmi < 18.5) {
+            return "underweight";
+        } else if (bmi >= 18.5 && bmi < 24.9) {
+            return "normal";
+        } else if (bmi >= 25 && bmi < 29.9) {
+            return "overweight";
+        } else {
+            return "extermely obese";
+        }
+    }
 }
